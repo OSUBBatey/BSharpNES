@@ -4,7 +4,7 @@
  */
 namespace BSharpEmu
 {
-    public class CPU
+    public class Ricoh2A03CPU
     {
         #region RegisterVariables
         uint PC { get;  set; } //Program Counter 
@@ -18,7 +18,7 @@ namespace BSharpEmu
         #endregion
 
 
-        public CPU()
+        public Ricoh2A03CPU()
         {
             //Initial(Start-Up) State 
             P = 0x34;

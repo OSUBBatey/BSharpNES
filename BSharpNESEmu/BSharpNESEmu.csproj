@@ -51,7 +51,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CPU.cs" />
+    <Compile Include="Ricoh2A03CPU.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ProcessStatusRegister.cs" />
   </ItemGroup>

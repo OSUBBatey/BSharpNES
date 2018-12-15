@@ -5,7 +5,7 @@ namespace BSharpEmu
     {
         private static int Main(string[] args)
         {
-            CPU test = new CPU();
+            Ricoh2A03CPU test = new Ricoh2A03CPU();
             test.RunInstruction();
             return 0;
         }
