@@ -51,7 +51,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="CPUMemoryMap.cs" />
     <Compile Include="MemoryRep.cs" />
     <Compile Include="IMemoryMap.cs" />
     <Compile Include="Ricoh2A03CPU.cs" />

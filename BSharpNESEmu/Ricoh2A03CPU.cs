@@ -63,10 +63,41 @@ namespace BSharpEmu
         }
 
         public void RunInstruction()
-        {
-            Console.WriteLine("Hello!");
-            Console.ReadKey();
+        {          
+          
             //Read an instruction and do something
+        }
+
+        public void PrintRegisters()
+        {
+            //TODO: REMOVE OR IMPROVE THIS.. ONLY FOR DEBUG PURPOSES CURRENTLY
+
+            string temp = P.ToString("X");
+            Console.WriteLine("Register P:");
+            Console.Write("0x");            
+            Console.WriteLine(temp);
+
+            temp = A.ToString("X");
+            Console.WriteLine("Register A:");
+            Console.Write("0x");
+            Console.WriteLine(temp);
+
+            Console.WriteLine("Register X:");
+            temp = X.ToString("X");
+            Console.Write("0x");
+            Console.WriteLine(temp);
+
+            Console.WriteLine("Register Y:");
+            temp = Y.ToString("X");
+            Console.Write("0x");
+            Console.WriteLine(temp);
+
+            Console.WriteLine("Register S:");
+            temp = S.ToString("X");
+            Console.Write("0x");
+            Console.WriteLine(temp);
+
+            Console.ReadLine();
         }
     }
 }

@@ -26,7 +26,16 @@ namespace BSharpEmu
 
         //TODO: 0x4018 to 0x401F  CPU TEST MODE .. SEE NESDEV WIKI
 
-        //TODO: CARTRIDGE SPACE 
+        //TODO: CARTRIDGE SPACE 0x4020 to 0xFFFF
 
+        /*
+         * NOTE: Common boards/mappers add ROM and save/work RAM 
+         * @ 0x6000 to 0x7FFF - Batter Back Save or Work RAM
+         * 0x8000 to 0xFFFF - usual ROM, commonly with mapper registers (MMC1 , UxROM as ex)
+         * 
+         * Sometimes cart split into upper /lower banks ... lower == 0x8000 to 0xBFFF
+         * Upper bank == 0xC000 to 0xFFFF
+         * 
+         */ 
     }
 }
