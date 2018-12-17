@@ -4,20 +4,8 @@
  */
 namespace BSharpEmu
 {
-    public class Ricoh2A03CPU
+    public class Ricoh2A03CPU:NMOS6502CPU
     {
-        #region RegisterVariables
-        uint PC { get;  set; } //Program Counter 
-        //TODO: REMODEL P AS A MODULE 
-        byte P { get;  set; } //Processor Status Flag Bits rep:(NV-B DIZC) see http://wiki.nesdev.com/w/index.php/CPU_ALL 
-        byte A { get;  set; } //8-bit Accumulator
-        byte X { get;  set; } //8-bit Index Register
-        byte Y { get;  set; } //8-bit Index Register
-        byte S { get;  set; } //Stack Pointer
-        uint LFSR { get;  set; } //Not sure what this is yet .. Noise Register for sound?
-        #endregion
-
-
         public Ricoh2A03CPU()
         {
             //Initial(Start-Up) State 
@@ -34,70 +22,15 @@ namespace BSharpEmu
             LFSR = 0x0000; // 1st time it is clocked from all zero, shifts in a 1
         }
 
-        /*
-         *Register Enums
-         */
-        public enum RegisterEnum
-        {
-            //Needs Research.. 
-            DMA = 0x4014,
-            INPUT_PORT1 = 0x4016,
-            INPUT_PORT2 = 0x4017,
-        }
-
-        /*
-         * Interrupts trigger flags based on specific criteria. Remember to do this.
-         */
-        public enum InterruptEnum
-        {
-            //Ordered By Priority (high to low)
-            RESET = 0xFFFC,
-            NMI = 0xFFFA,
-            IRQ_BREAK = 0xFFFE,
-        }
-
         public void ResetCPU()
         {
             S -= 3;         //Decrement stack pointer by 3
             P = (byte)(P | 0x04); //Set IRQ Interrupt Disable Flag to on.. leave other flags as is            
         }
 
-        public void RunInstruction()
+        public override void RunInstruction()
         {          
-          
             //Read an instruction and do something
-        }
-
-        public void PrintRegisters()
-        {
-            //TODO: REMOVE OR IMPROVE THIS.. ONLY FOR DEBUG PURPOSES CURRENTLY
-
-            string temp = P.ToString("X");
-            Console.WriteLine("Register P:");
-            Console.Write("0x");            
-            Console.WriteLine(temp);
-
-            temp = A.ToString("X");
-            Console.WriteLine("Register A:");
-            Console.Write("0x");
-            Console.WriteLine(temp);
-
-            Console.WriteLine("Register X:");
-            temp = X.ToString("X");
-            Console.Write("0x");
-            Console.WriteLine(temp);
-
-            Console.WriteLine("Register Y:");
-            temp = Y.ToString("X");
-            Console.Write("0x");
-            Console.WriteLine(temp);
-
-            Console.WriteLine("Register S:");
-            temp = S.ToString("X");
-            Console.Write("0x");
-            Console.WriteLine(temp);
-
-            Console.ReadLine();
-        }
+        }      
     }
 }

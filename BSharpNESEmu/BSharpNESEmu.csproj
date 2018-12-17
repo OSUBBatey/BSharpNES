@@ -51,6 +51,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NMOS6502CPU.cs" />
+    <Compile Include="ICPU_NMOS6502.cs" />
+    <Compile Include="Ricoh2A03InstrSet.cs" />
     <Compile Include="CPUMemoryMap.cs" />
     <Compile Include="MemoryRep.cs" />
     <Compile Include="IMemoryMap.cs" />
