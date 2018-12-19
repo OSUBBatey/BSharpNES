@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BSharpEmu
+namespace BSharpEmu.Enums
 {
-    interface ICPU
+    class Class1
     {
-         void RunCPU();
-         void PrintRegisters();
     }
 }

@@ -51,9 +51,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\Class1.cs" />
+    <Compile Include="Enums\InterruptEnums.cs" />
+    <Compile Include="Enums\RegisterEnums.cs" />
     <Compile Include="NMOS6502CPU.cs" />
     <Compile Include="ICPU_NMOS6502.cs" />
-    <Compile Include="Ricoh2A03InstrSet.cs" />
+    <Compile Include="Ricoh2A03CPU.InstrSet.cs" />
     <Compile Include="CPUMemoryMap.cs" />
     <Compile Include="MemoryRep.cs" />
     <Compile Include="IMemoryMap.cs" />

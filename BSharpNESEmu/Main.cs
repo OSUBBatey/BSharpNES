@@ -1,4 +1,6 @@
 ﻿using System;
+using BSharpEmu.CPU;
+
 namespace BSharpEmu
 {
     public class BSharp
@@ -6,6 +8,8 @@ namespace BSharpEmu
         private static int Main(string[] args)
         {
             Ricoh2A03CPU test = new Ricoh2A03CPU();
+            test.PrintRegisters();           
+            test.RunCPU();
             test.PrintRegisters();
             test.ResetCPU();
             test.PrintRegisters();
