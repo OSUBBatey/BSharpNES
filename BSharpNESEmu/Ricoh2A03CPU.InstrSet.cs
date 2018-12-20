@@ -17,6 +17,7 @@ namespace BSharpEmu.CPU
         //TODO: REORDER OPCODES BY FREQUENCY OF USE .. CURRENTLY DONE ALPHABETICALLY
         //Current Build is agnostic to address mode currently... may keep it that way once i understand more
         //TODO: RESEARCH ADDRESSING MODES AND IMPLEMENT AS/WHERE NEEDED
+        //TODO:IMPLEMENT PC COUNTER ADJUSTMENTS AND ACCESS
 
         private void ExecuteInstruction(byte instr, byte input)
         {
@@ -38,18 +39,54 @@ namespace BSharpEmu.CPU
                  * 
                  */
                     byte temp = (byte)(A + input + CarryFlag());
-                    SetZeroFlag((byte)(temp&0xFF));
+                    SetZeroFlag((byte)(temp & 0xFF));
                     SetSignFlag(temp);
                     SetOverFlowFlag(!(((byte)((A ^ input) & 0x80) & ((A ^ temp) & 0x80))==0));
                     SetCarryFlag(Convert.ToByte(temp > 0xff));
-                    A = temp;
-                    //TODO:IMPLEMENT PC COUNTER ADJUSTMENTS AND ACCESS
+                    A = temp;                    
+                    break;
+                
+                case 0x21:            
+                case 0x25:
+                case 0x2D:
+                case 0x29:
+                case 0x31:
+                case 0x35:
+                case 0x39:               
+                case 0x3D:
+                /*                  
+                 * AND (bitwise AND with accumulator)
+                 * Affects Flags: S Z
+                 * 
+                 */
+                    input &= A;
+                    SetSignFlag(input);
+                    SetZeroFlag(input);
+                    A = input;
+                    break;
+
+                case 0x0A:
+                case 0x06:
+                case 0x16:
+                case 0x0E:
+                case 0x1E:
+                    /*
+                     * ASL (Arithmetic Shift Left)
+                     * Affects Flags: S Z C
+                     */
+                    SetCarryFlag((byte)(input & 0x80));
+                    input <<= 1;
+                    input &= 0xff;
+                    SetSignFlag(input);
+                    SetZeroFlag(input);
+                    //TODO: STORE src in memory loc or accumulator depending on addressing mode.
+                    A = input; //Only accumulator store implemented currently
                     break;
 
                 default: break;
             }                        
         }
-
+               
         private void SetZeroFlag(byte condition)
         {
             if (condition == 0x0)
