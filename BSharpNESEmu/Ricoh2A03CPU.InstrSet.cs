@@ -25,70 +25,133 @@ namespace BSharpEmu.CPU
             switch(instr)
             {
                 #region Opcode/ClockCycles
-                // ADC 
+                // ADC - Add with Carry
                 case 0x61:
+                    CPUCycles += 6;
                     goto case (byte)OpCode.ADC;
                 case 0x71:
+                    CPUCycles += 5;
+                    //Add 1 Cycle if Page Boundary Crossed
+                    //TODO: Figure out how/when/why to determine and add this
                     goto case (byte)OpCode.ADC;
                 case 0x65:
+                    CPUCycles += 3;
                     goto case (byte)OpCode.ADC;
                 case 0x75:
+                    CPUCycles += 4;
                     goto case (byte)OpCode.ADC;
                 case 0x69:
+                    CPUCycles += 2;
                     goto case (byte)OpCode.ADC;
                 case 0x79:
+                    CPUCycles += 4;
+                    //Add 1 Cycle if Page Boundary Crossed
+                    //TODO: Figure out how/when/why to determine and add this
                     goto case (byte)OpCode.ADC;
                 case 0x6D:
+                    CPUCycles += 4;
                     goto case (byte)OpCode.ADC;
                 case 0x7D:
+                    CPUCycles += 4;
+                    //Add 1 Cycle if Page Boundary Crossed
+                    //TODO: Figure out how/when/why to determine and add this
                     goto case (byte)OpCode.ADC;        
                 
-                // AND
+                // AND - (bitwise AND with accumulator)
                 case 0x21:
+                    CPUCycles += 6;
                     goto case (byte)OpCode.AND;
                 case 0x25:
+                    CPUCycles += 3;
                     goto case (byte)OpCode.AND;
                 case 0x2D:
+                    CPUCycles += 4;                    
                     goto case (byte)OpCode.AND;
                 case 0x29:
+                    CPUCycles += 2;
                     goto case (byte)OpCode.AND;
                 case 0x31:
+                    CPUCycles += 5;
+                    //Add 1 Cycle if Page Boundary Crossed
+                    //TODO: Figure out how/when/why to determine and add this
                     goto case (byte)OpCode.AND;
                 case 0x35:
+                    CPUCycles += 4;
                     goto case (byte)OpCode.AND;
                 case 0x39:
+                    CPUCycles += 4;
+                    //Add 1 Cycle if Page Boundary Crossed
+                    //TODO: Figure out how/when/why to determine and add this
                     goto case (byte)OpCode.AND;
                 case 0x3D:
+                    CPUCycles += 4;
+                    //Add 1 Cycle if Page Boundary Crossed
+                    //TODO: Figure out how/when/why to determine and add this
                     goto case (byte)OpCode.AND;               
 
-                // ASL
+                // ASL - Arithmetic Shift Left
                 case 0x0A:
+                    CPUCycles += 2;
                     goto case (byte)OpCode.ASL;
                 case 0x06:
+                    CPUCycles += 5;
                     goto case (byte)OpCode.ASL;
                 case 0x16:
+                    CPUCycles += 6;
                     goto case (byte)OpCode.ASL;
                 case 0x0E:
+                    CPUCycles += 6;
                     goto case (byte)OpCode.ASL;
                 case 0x1E:
+                    CPUCycles += 7;
                     goto case (byte)OpCode.ASL;
 
                 //Branch Cases
-                case 0x90: //BCC
-                    Branch(!(CarryFlag()==0x0),input);
+                case 0x90: //BCC - Branch on Carry Clear
+                    Branch(GetCarryFlag()==0x0,input);
                     break;
+                case 0xB0: //BCS - Branch on Carry Set
+                    Branch(!(GetCarryFlag() == 0x0), input);
+                    break;
+                case 0xF0: //BEQ - Branch on Equal  
+                    Branch(!(GetZeroFlag() == 0x0), input);
+                    break;
+                case 0x30: //BMI - Branch on Minus
+                    Branch(!(GetSignFlag() == 0x0), input);
+                    break;
+                case 0xD0: //BNE - Branch on not Equal  
+                    Branch(GetZeroFlag() == 0x0, input);
+                    break;
+                case 0x10: //BPL - Branch on Plus
+                    Branch(!(GetSignFlag() == 0x0), input);
+                    break;
+                case 0x50: //BVC - Branch on OverFlow Clear
+                    Branch((GetOverFlowFlag() == 0x0), input);
+                    break;
+                case 0x70: //BVS- Branch on OverFlow Set
+                    Branch(!(GetOverFlowFlag() == 0x0), input);
+                    break;
+
+                //BIT - test BITs
+                case 0x42:
+                    CPUCycles += 3;
+                    goto case (byte)OpCode.BIT;
+                case 0x2C:
+                    CPUCycles += 4;
+                    goto case (byte)OpCode.BIT;
+
                 #endregion
 
 
                 #region Opcode Logic
-             /*
-              * ADC - ADD WITH CARRY FUNCTION
-              * 
-              * Affects Flags: S V Z C
-              * 
-              */
+                /*
+                 * ADC - ADD WITH CARRY FUNCTION
+                 * 
+                 * Affects Flags: S V Z C
+                 * 
+                 */
                 case (byte)OpCode.ADC:                 
-                    byte temp = (byte)(A + input + CarryFlag());
+                    byte temp = (byte)(A + input + GetCarryFlag());
                     SetZeroFlag((byte)(temp & 0xFF));
                     SetSignFlag(temp);
                     SetOverFlowFlag(!(((byte)((A ^ input) & 0x80) & ((A ^ temp) & 0x80)) == 0));
@@ -121,6 +184,17 @@ namespace BSharpEmu.CPU
                     //TODO: STORE src in memory loc or accumulator depending on addressing mode.
                     A = input; //Only accumulator store implemented currently
                     break;
+
+                /*
+                 * Bit (test BITs)
+                 * Affects Flags: N V Z
+                 */
+                case (byte)OpCode.BIT:
+                   
+                    SetSignFlag(input);
+                    SetOverFlowFlag((0x40 & input)!=0x0);   /* Copy bit 6 to OVERFLOW flag. */
+                    SetZeroFlag((byte)(input & A));
+                    break;
              
                 #endregion
 
@@ -137,24 +211,15 @@ namespace BSharpEmu.CPU
             if (condition)
             {
                 CPUCycles += (PC & 0xFF00) != (inputAddr & 0xFF00) ? 2 : 1;
-                PC = inputAddr;
+                PC += inputAddr; 
             }
-        }
-               
-        private void SetZeroFlag(byte condition)
-        {
-            if (condition == 0x0)
-            {
-                P = ChangeBit(P, 1, 0);  //Set Zero Bit to 0
-            }
-            else
-            {
-                P = ChangeBit(P, 1, 1);  //Set Zero Bit to 1
-            }
-        }
+        }   
+
+        //TODO: Many of these get methods could be removed and replaced by boolean values for the flags
+        //TODO: A module that represents the Processor Status should be made to accomplish this 
 
         //Returns the value of the carry flag
-        private byte CarryFlag()
+        private byte GetCarryFlag()
         {
             byte output = 0x00;
             if((P & 0x1) == 0x1 )
@@ -163,7 +228,49 @@ namespace BSharpEmu.CPU
             }
             return output;
         }
-      
+        //Returns the value of the zero flag
+        private byte GetZeroFlag()
+        {
+            byte output = 0x00;
+            if ((P & 0x02) == 0x02)
+            {
+                output = 0x1;
+            }
+            return output;
+        }
+        //Returns the value of the sign flag
+        private byte GetSignFlag()
+        {
+            byte output = 0x00;
+            if ((P & 0x20) == 0x20)
+            {
+                output = 0x1;
+            }
+            return output;
+        }
+
+        //Returns the value of the sign flag
+        private byte GetOverFlowFlag()
+        {
+            byte output = 0x00;
+            if ((P & 0x10) == 0x10)
+            {
+                output = 0x1;
+            }
+            return output;
+        }
+
+        private void SetZeroFlag(byte condition)
+        {
+            if (condition == 0x0)
+            {
+                P = ChangeBit(P, 1, 1);  //Set Zero Bit to 1
+            }
+            else
+            {
+                P = ChangeBit(P, 1, 0);  //Set Zero Bit to 0
+            }
+        }
         private void SetSignFlag(byte temp)
         {
             
