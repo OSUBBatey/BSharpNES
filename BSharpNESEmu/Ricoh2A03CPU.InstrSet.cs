@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BSharpEmu.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,57 +24,95 @@ namespace BSharpEmu.CPU
         {
             switch(instr)
             {
-               
+                #region Opcode/ClockCycles
+                // ADC 
                 case 0x61:
+                    goto case (byte)OpCode.ADC;
                 case 0x71:
+                    goto case (byte)OpCode.ADC;
                 case 0x65:
+                    goto case (byte)OpCode.ADC;
                 case 0x75:
+                    goto case (byte)OpCode.ADC;
                 case 0x69:
+                    goto case (byte)OpCode.ADC;
                 case 0x79:
+                    goto case (byte)OpCode.ADC;
                 case 0x6D:
+                    goto case (byte)OpCode.ADC;
                 case 0x7D:
-                /*
-                 * ADC - ADD WITH CARRY FUNCTION
-                 * 
-                 * Affects Flags: S V Z C
-                 * 
-                 */
+                    goto case (byte)OpCode.ADC;        
+                
+                // AND
+                case 0x21:
+                    goto case (byte)OpCode.AND;
+                case 0x25:
+                    goto case (byte)OpCode.AND;
+                case 0x2D:
+                    goto case (byte)OpCode.AND;
+                case 0x29:
+                    goto case (byte)OpCode.AND;
+                case 0x31:
+                    goto case (byte)OpCode.AND;
+                case 0x35:
+                    goto case (byte)OpCode.AND;
+                case 0x39:
+                    goto case (byte)OpCode.AND;
+                case 0x3D:
+                    goto case (byte)OpCode.AND;               
+
+                // ASL
+                case 0x0A:
+                    goto case (byte)OpCode.ASL;
+                case 0x06:
+                    goto case (byte)OpCode.ASL;
+                case 0x16:
+                    goto case (byte)OpCode.ASL;
+                case 0x0E:
+                    goto case (byte)OpCode.ASL;
+                case 0x1E:
+                    goto case (byte)OpCode.ASL;
+
+                //Branch Cases
+                case 0x90: //BCC
+                    Branch(!(CarryFlag()==0x0),input);
+                    break;
+                #endregion
+
+
+                #region Opcode Logic
+             /*
+              * ADC - ADD WITH CARRY FUNCTION
+              * 
+              * Affects Flags: S V Z C
+              * 
+              */
+                case (byte)OpCode.ADC:                 
                     byte temp = (byte)(A + input + CarryFlag());
                     SetZeroFlag((byte)(temp & 0xFF));
                     SetSignFlag(temp);
-                    SetOverFlowFlag(!(((byte)((A ^ input) & 0x80) & ((A ^ temp) & 0x80))==0));
+                    SetOverFlowFlag(!(((byte)((A ^ input) & 0x80) & ((A ^ temp) & 0x80)) == 0));
                     SetCarryFlag(Convert.ToByte(temp > 0xff));
-                    A = temp;                    
+                    A = temp;
                     break;
-                
-                case 0x21:            
-                case 0x25:
-                case 0x2D:
-                case 0x29:
-                case 0x31:
-                case 0x35:
-                case 0x39:               
-                case 0x3D:
-                /*                  
-                 * AND (bitwise AND with accumulator)
-                 * Affects Flags: S Z
-                 * 
-                 */
+
+             /*                  
+              * AND (bitwise AND with accumulator)
+              * Affects Flags: S Z
+              * 
+              */
+                case (byte)OpCode.AND:
                     input &= A;
                     SetSignFlag(input);
                     SetZeroFlag(input);
                     A = input;
                     break;
 
-                case 0x0A:
-                case 0x06:
-                case 0x16:
-                case 0x0E:
-                case 0x1E:
-                    /*
-                     * ASL (Arithmetic Shift Left)
-                     * Affects Flags: S Z C
-                     */
+             /*
+              * ASL (Arithmetic Shift Left)
+              * Affects Flags: S Z C
+              */
+                case (byte)OpCode.ASL:
                     SetCarryFlag((byte)(input & 0x80));
                     input <<= 1;
                     input &= 0xff;
@@ -82,9 +121,24 @@ namespace BSharpEmu.CPU
                     //TODO: STORE src in memory loc or accumulator depending on addressing mode.
                     A = input; //Only accumulator store implemented currently
                     break;
+             
+                #endregion
 
                 default: break;
+
             }                        
+        }
+
+        /*
+         * Branching logic. 
+         */ 
+        private void Branch(bool condition, byte inputAddr)
+        {
+            if (condition)
+            {
+                CPUCycles += (PC & 0xFF00) != (inputAddr & 0xFF00) ? 2 : 1;
+                PC = inputAddr;
+            }
         }
                
         private void SetZeroFlag(byte condition)
@@ -113,7 +167,7 @@ namespace BSharpEmu.CPU
         private void SetSignFlag(byte temp)
         {
             
-            if((temp & 0x40) == 1) //If 7th bit is 1
+            if((temp & 0x80) == 1) //If 7th bit is 1
             {
                 P = (byte)(P | 0x20); // Set SignBit to 1
             }

@@ -33,7 +33,7 @@ namespace BSharpEmu.CPU
         public override void RunCPU()
         {
             //Temporary, for testing while building
-            ExecuteInstruction(0x65, 0x22);                     
+            ExecuteInstruction(0x69, 0x22);                     
         }                   
     }
 }

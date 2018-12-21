@@ -51,7 +51,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums\Class1.cs" />
+    <Compile Include="Enums\OpCodeEnums.cs" />
     <Compile Include="Enums\InterruptEnums.cs" />
     <Compile Include="Enums\RegisterEnums.cs" />
     <Compile Include="NMOS6502CPU.cs" />
