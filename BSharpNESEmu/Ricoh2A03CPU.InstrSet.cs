@@ -213,11 +213,12 @@ namespace BSharpEmu.CPU
                 CPUCycles += (PC & 0xFF00) != (inputAddr & 0xFF00) ? 2 : 1;
                 PC += inputAddr; 
             }
-        }   
+        }
 
         //TODO: Many of these get methods could be removed and replaced by boolean values for the flags
         //TODO: A module that represents the Processor Status should be made to accomplish this 
 
+        #region GetFlag Methods
         //Returns the value of the carry flag
         private byte GetCarryFlag()
         {
@@ -259,6 +260,9 @@ namespace BSharpEmu.CPU
             }
             return output;
         }
+        #endregion
+
+        #region SetFlag Methods
 
         private void SetZeroFlag(byte condition)
         {
@@ -307,7 +311,8 @@ namespace BSharpEmu.CPU
                 P = ChangeBit(P, 0, 1);  //Set Carry Bit to 1
             }
         }
-
+        #endregion
+        
         /*
          * Changes the value of a bit in a byte. 
          * Adapted from https://www.geeksforgeeks.org/modify-bit-given-position/
