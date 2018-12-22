@@ -144,6 +144,48 @@ namespace BSharpEmu.CPU
                 case 0x00:
                     CPUCycles += 7;
                     goto case (byte)OpCode.BRK;
+
+                /*CLC - Clear Carry)*/
+                case 0x18:
+                    CPUCycles += 2;
+                    SetCarryFlag(0);
+                    break;
+
+                /*SEC - Set Carry)*/
+                case 0x38:
+                    CPUCycles += 2;
+                    SetCarryFlag(1);
+                    break;
+
+                /*CLI - Clear IRQ)*/
+                case 0x58:
+                    CPUCycles += 2;
+                    SetIRQFlag(0);
+                    break;
+
+                /*SEI - Set IRQ)*/
+                case 0x78:
+                    CPUCycles += 2;
+                    SetIRQFlag(1);
+                    break;
+
+                /*CLV - Clear Overflow)*/
+                case 0xB8:
+                    CPUCycles += 2;
+                    SetOverFlowFlag(false);
+                    break;
+
+                /*CLD - Clear Decimal)*/
+                case 0xD8:
+                    CPUCycles += 2;
+                    SetDecimalFlag(0);
+                    break;
+
+                /*SED - Set Decimal)*/
+                case 0xF8:
+                    CPUCycles += 2;
+                    SetDecimalFlag(1);
+                    break;
                 #endregion
 
 
@@ -328,6 +370,18 @@ namespace BSharpEmu.CPU
             }
         }
 
+        private void SetDecimalFlag(byte condition)
+        {
+            if (condition == 0x0)
+            {
+                P = ChangeBit(P, 3, 0);  //Set Carry Bit to 0
+            }
+            else
+            {
+                P = ChangeBit(P, 3, 1);  //Set Carry Bit to 1
+            }
+        }
+
         private void SetIRQFlag(byte condition)
         {
             if (condition == 0x0)
@@ -352,14 +406,13 @@ namespace BSharpEmu.CPU
             return output;
         }
 
-        /*
-         *  Push to Stack 
-         */ 
+        /*Push to Stack */ 
         private void Push(byte input)
         {
             WriteToMem((uint)(CPURegisterType.STACKLOC + S--));          
         }
 
+        /*Pop from Stack*/
         private byte Pop()
         {
            return ReadByte((uint)(CPURegisterType.STACKLOC + S--));
