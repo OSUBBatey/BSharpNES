@@ -26,16 +26,27 @@ namespace BSharpEmu.CPU
 
         public void ResetCPU()
         {
-            S -= 3;                          //Decrement stack pointer by 3
-            P = (byte)(P | 0x04);            //Set IRQ Interrupt Disable Flag to on.. leave other flags as is            
-            CPUCycles = 0;                   //Set Cycle counter back to zero
-            PC = (uint)InterruptType.RESET;  //Reset PC counter to expected address
+            S -= 3;                                         //Decrement stack pointer by 3
+            P = (byte)(P | (byte)CPURegisterType.IRQBIT);   //Set IRQ Interrupt Disable Flag to on.. leave other flags as is            
+            CPUCycles = 0;                                  //Set Cycle counter back to zero
+            PC = (uint)InterruptType.RESET;                 //Reset PC counter to expected address
         }
 
         public override void RunCPU()
         {
             //Temporary, for testing while building
             ExecuteInstruction(0x69, 0x22);                     
-        }                   
+        }
+        
+        private void WriteToMem(uint address)
+        {
+            //TODO: IMPLEMENT WRITE TO MEM ... POSSIBLE RENAME
+        }
+
+        private byte ReadByte(uint address)
+        {
+            //TODO: IMPLEMENT READ MEM
+            return 0;
+        }
     }
 }

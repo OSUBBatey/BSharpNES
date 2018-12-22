@@ -25,7 +25,7 @@ namespace BSharpEmu.CPU
             switch(instr)
             {
                 #region Opcode/ClockCycles
-                // ADC - Add with Carry
+                /* ADC - Add with Carry */
                 case 0x61:
                     CPUCycles += 6;
                     goto case (byte)OpCode.ADC;
@@ -55,9 +55,9 @@ namespace BSharpEmu.CPU
                     CPUCycles += 4;
                     //Add 1 Cycle if Page Boundary Crossed
                     //TODO: Figure out how/when/why to determine and add this
-                    goto case (byte)OpCode.ADC;        
-                
-                // AND - (bitwise AND with accumulator)
+                    goto case (byte)OpCode.ADC;
+
+                /* AND - (bitwise AND with accumulator) */
                 case 0x21:
                     CPUCycles += 6;
                     goto case (byte)OpCode.AND;
@@ -89,7 +89,7 @@ namespace BSharpEmu.CPU
                     //TODO: Figure out how/when/why to determine and add this
                     goto case (byte)OpCode.AND;               
 
-                // ASL - Arithmetic Shift Left
+                /* ASL - Arithmetic Shift Left */
                 case 0x0A:
                     CPUCycles += 2;
                     goto case (byte)OpCode.ASL;
@@ -106,7 +106,7 @@ namespace BSharpEmu.CPU
                     CPUCycles += 7;
                     goto case (byte)OpCode.ASL;
 
-                //Branch Cases
+                /*Branch Cases*/
                 case 0x90: //BCC - Branch on Carry Clear
                     Branch(GetCarryFlag()==0x0,input);
                     break;
@@ -132,7 +132,7 @@ namespace BSharpEmu.CPU
                     Branch(!(GetOverFlowFlag() == 0x0), input);
                     break;
 
-                //BIT - test BITs
+                /*BIT - test BITs*/
                 case 0x42:
                     CPUCycles += 3;
                     goto case (byte)OpCode.BIT;
@@ -140,6 +140,10 @@ namespace BSharpEmu.CPU
                     CPUCycles += 4;
                     goto case (byte)OpCode.BIT;
 
+                /*BRK - Break*/                
+                case 0x00:
+                    CPUCycles += 7;
+                    goto case (byte)OpCode.BRK;
                 #endregion
 
 
@@ -195,7 +199,19 @@ namespace BSharpEmu.CPU
                     SetOverFlowFlag((0x40 & input)!=0x0);   /* Copy bit 6 to OVERFLOW flag. */
                     SetZeroFlag((byte)(input & A));
                     break;
-             
+
+                /*
+                 * BRK (Break)
+                 * Affects Flags : B
+                 */
+                case (byte)OpCode.BRK:                   
+                    PC++;
+                    Push((byte)((PC >> 8) & 0xff)); /* Push return address onto the stack. */
+                    Push((byte)(PC & 0xff));                  
+                    Push((byte)(P | (byte)CPURegisterType.BREAKBIT));
+                    SetIRQFlag(1);
+                    PC = (uint)(ReadByte(0xFFFE) | (ReadByte(0xFFFF) << 8));
+                    break;
                 #endregion
 
                 default: break;
@@ -223,7 +239,7 @@ namespace BSharpEmu.CPU
         private byte GetCarryFlag()
         {
             byte output = 0x00;
-            if((P & 0x1) == 0x1 )
+            if((P & (byte)CPURegisterType.CARRYBIT) == (byte)CPURegisterType.CARRYBIT )
             {
                 output = 0x1;
             }
@@ -233,7 +249,7 @@ namespace BSharpEmu.CPU
         private byte GetZeroFlag()
         {
             byte output = 0x00;
-            if ((P & 0x02) == 0x02)
+            if ((P & (byte)CPURegisterType.ZEROBIT) == (byte)CPURegisterType.ZEROBIT)
             {
                 output = 0x1;
             }
@@ -243,7 +259,7 @@ namespace BSharpEmu.CPU
         private byte GetSignFlag()
         {
             byte output = 0x00;
-            if ((P & 0x20) == 0x20)
+            if ((P & (byte)CPURegisterType.SIGNBIT) == (byte)CPURegisterType.SIGNBIT)
             {
                 output = 0x1;
             }
@@ -254,7 +270,7 @@ namespace BSharpEmu.CPU
         private byte GetOverFlowFlag()
         {
             byte output = 0x00;
-            if ((P & 0x10) == 0x10)
+            if ((P & (byte)CPURegisterType.OVERFLOWBIT) == (byte)CPURegisterType.OVERFLOWBIT)
             {
                 output = 0x1;
             }
@@ -280,11 +296,11 @@ namespace BSharpEmu.CPU
             
             if((temp & 0x80) == 1) //If 7th bit is 1
             {
-                P = (byte)(P | 0x20); // Set SignBit to 1
+                P = (byte)(P | (byte)CPURegisterType.SIGNBIT); // Set SignBit to 1
             }
             else
             {                
-                P = ChangeBit(P, 5, 0); //Else Set SignBit to 0
+                P = ChangeBit(P, 6, 0); //Else Set SignBit to 0
             }
         }
 
@@ -292,11 +308,11 @@ namespace BSharpEmu.CPU
         {
             if (condition)
             {                
-                P = ChangeBit(P, 4, 1); //Set OverFlow Bit to 1
+                P = ChangeBit(P, 5, 1); //Set OverFlow Bit to 1
             }
             else
             {
-                P = ChangeBit(P, 4, 0); //Else Set OverFlow Bit to 0
+                P = ChangeBit(P, 5, 0); //Else Set OverFlow Bit to 0
             }
         }
 
@@ -309,6 +325,18 @@ namespace BSharpEmu.CPU
             else
             {
                 P = ChangeBit(P, 0, 1);  //Set Carry Bit to 1
+            }
+        }
+
+        private void SetIRQFlag(byte condition)
+        {
+            if (condition == 0x0)
+            {
+                P = ChangeBit(P, 2, 0);  //Set IRQ Disabled Bit to 0
+            }
+            else
+            {
+                P = ChangeBit(P, 2, 1);  //Set IRQ Disabled Bit to 1
             }
         }
         #endregion
@@ -324,5 +352,17 @@ namespace BSharpEmu.CPU
             return output;
         }
 
+        /*
+         *  Push to Stack 
+         */ 
+        private void Push(byte input)
+        {
+            WriteToMem((uint)(CPURegisterType.STACKLOC + S--));          
+        }
+
+        private byte Pop()
+        {
+           return ReadByte((uint)(CPURegisterType.STACKLOC + S--));
+        }
     }
 }

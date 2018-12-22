@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace BSharpEmu.Enums
 {
     /*
-     * Register Enums
+     * CPU/Register Enums
      */
-    public enum RegisterType
+    public enum CPURegisterType
     {
         //Needs Research.. 
         DMA = 0x4014,
@@ -20,5 +20,12 @@ namespace BSharpEmu.Enums
         X = 0x03,
         Y = 0x04,
         S = 0x05,
+        STACKLOC = 0x100,
+        BREAKBIT = 0x10,
+        SIGNBIT = 0x40,
+        OVERFLOWBIT = 0x20,
+        IRQBIT = 0x04,
+        ZEROBIT = 0x02,
+        CARRYBIT = 0x01,
     }
 }

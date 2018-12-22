@@ -17,6 +17,7 @@ namespace BSharpEmu.Enums
         AND = 0x13,
         ASL = 0x23,
         BIT = 0x33,
+        BRK = 0x43,
        
     }
 }

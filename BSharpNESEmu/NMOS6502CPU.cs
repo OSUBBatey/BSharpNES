@@ -12,12 +12,11 @@ namespace BSharpEmu.CPU
         #region RegisterVariables      
         public uint PC { get; protected set; }  //Program Counter 
         //TODO: REMODEL P AS A MODULE         
-        protected byte P { get; set; }          //Processor Status Flag Bits rep:(NVD IZC) see http://wiki.nesdev.com/w/index.php/CPU_ALL 
+        protected byte P { get; set; }          //Processor Status Flag Bits rep:(NVD-BIZC) see http://wiki.nesdev.com/w/index.php/CPU_ALL 
         protected byte A { get; set; }          //8-bit Accumulator
         protected byte X { get; set; }          //8-bit Index Register
         protected byte Y { get; set; }          //8-bit Index Register
-        protected byte S { get; set; }          //Stack Pointer
-        protected bool BFlag { get; set; }      //B-Flag  
+        protected byte S { get; set; }          //Stack Pointer       
         protected uint LFSR { get; set; }       //Not sure what this is yet .. Noise Register for sound?
         protected long CPUCycles { get; set; }  //CPU Cycle Tracker
         #endregion

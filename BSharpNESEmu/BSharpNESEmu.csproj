@@ -53,7 +53,7 @@
   <ItemGroup>
     <Compile Include="Enums\OpCodeEnums.cs" />
     <Compile Include="Enums\InterruptEnums.cs" />
-    <Compile Include="Enums\RegisterEnums.cs" />
+    <Compile Include="Enums\CPURegisterEnums.cs" />
     <Compile Include="NMOS6502CPU.cs" />
     <Compile Include="ICPU_NMOS6502.cs" />
     <Compile Include="Ricoh2A03CPU.InstrSet.cs" />
