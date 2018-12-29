@@ -15,10 +15,7 @@ namespace BSharpEmu.CPU
      */
     public partial class Ricoh2A03CPU
     {
-        //TODO: REORDER OPCODES BY FREQUENCY OF USE .. CURRENTLY DONE ALPHABETICALLY
-        //Current Build is agnostic to address mode currently... may keep it that way once i understand more
-        //TODO: RESEARCH ADDRESSING MODES AND IMPLEMENT AS/WHERE NEEDED
-        //TODO:IMPLEMENT PC COUNTER ADJUSTMENTS AND ACCESS
+        //TODO: REORDER OPCODES BY FREQUENCY OF USE .. CURRENTLY DONE ALPHABETICALLY                       
 
         private void ExecuteInstruction(byte instr, byte input)
         {
@@ -169,17 +166,20 @@ namespace BSharpEmu.CPU
                     SetIRQFlag(1);
                     break;
 
+                /*CLD - Clear Decimal)*/
+                case 0xD8:
+                    CPUCycles += 2;
+                    SetDecimalFlag(0);
+                    break;
+
                 /*CLV - Clear Overflow)*/
                 case 0xB8:
                     CPUCycles += 2;
                     SetOverFlowFlag(false);
                     break;
 
-                /*CLD - Clear Decimal)*/
-                case 0xD8:
-                    CPUCycles += 2;
-                    SetDecimalFlag(0);
-                    break;
+                /* CMP - Compare Accumulator */
+                
 
                 /*SED - Set Decimal)*/
                 case 0xF8:
@@ -197,12 +197,12 @@ namespace BSharpEmu.CPU
                  * 
                  */
                 case (byte)OpCode.ADC:                 
-                    byte temp = (byte)(A + input + GetCarryFlag());
+                    var temp = (A + input + GetCarryFlag());
                     SetZeroFlag((byte)(temp & 0xFF));
-                    SetSignFlag(temp);
+                    SetSignFlag((byte)temp);
                     SetOverFlowFlag(!(((byte)((A ^ input) & 0x80) & ((A ^ temp) & 0x80)) == 0));
                     SetCarryFlag(Convert.ToByte(temp > 0xff));
-                    A = temp;
+                    A = (byte)temp;
                     break;
 
              /*                  
@@ -254,9 +254,22 @@ namespace BSharpEmu.CPU
                     SetIRQFlag(1);
                     PC = (uint)(ReadByte(0xFFFE) | (ReadByte(0xFFFF) << 8));
                     break;
+
+                /* 
+                 * CMP - Compare Accumulator 
+                 * Affects Flags : S, Z, C
+                 */
+                case (byte)OpCode.CMP:                    
+                    var result = (A-input);                   
+                    SetCarryFlag(Convert.ToByte(result > 0x100)); 
+                    SetSignFlag((byte)result);
+                    SetZeroFlag((byte)(result &= 0xff));
+                    break;
                 #endregion
 
                 default: break;
+
+                
 
             }                        
         }

@@ -18,6 +18,8 @@ namespace BSharpEmu.Enums
         ASL = 0x23,
         BIT = 0x33,
         BRK = 0x43,
+        CMP = 0x53,
+
        
     }
 }
