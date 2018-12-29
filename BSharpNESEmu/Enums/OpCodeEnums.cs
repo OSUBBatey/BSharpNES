@@ -19,6 +19,8 @@ namespace BSharpEmu.Enums
         BIT = 0x33,
         BRK = 0x43,
         CMP = 0x53,
+        CPX = 0x63,
+        CPY = 0x73,
 
        
     }

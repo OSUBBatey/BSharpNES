@@ -179,7 +179,67 @@ namespace BSharpEmu.CPU
                     break;
 
                 /* CMP - Compare Accumulator */
-                
+                //TODO: COMBINE WITH CPX/CPY
+                case 0xC9:
+                    CPUCycles += 2;
+                    goto case (byte)OpCode.CMP;
+
+                case 0xC5:
+                    CPUCycles += 3;
+                    goto case (byte)OpCode.CMP;
+
+                case 0xD5:
+                    CPUCycles += 4;
+                    goto case (byte)OpCode.CMP;
+
+                case 0xCD:
+                    CPUCycles += 4;
+                    goto case (byte)OpCode.CMP;
+
+                case 0xDD:
+                    CPUCycles += 4;
+                    //TODO:+ add 1 cycle if page boundary crossed
+                    goto case (byte)OpCode.CMP;
+
+                case 0xD9:
+                    CPUCycles += 4;
+                    //TODO:+ add 1 cycle if page boundary crossed
+                    goto case (byte)OpCode.CMP;
+
+                case 0xC1:
+                    CPUCycles += 6;
+                    goto case (byte)OpCode.CMP;
+
+                case 0xD1:
+                    CPUCycles += 5;
+                    //TODO:+ add 1 cycle if page boundary crossed
+                    goto case (byte)OpCode.CMP;
+
+                /* CPX - Compare X Register */
+                case 0xE0:
+                    CPUCycles += 2;
+                    goto case (byte)OpCode.CPX;
+
+                case 0xE4:
+                    CPUCycles += 3;
+                    goto case (byte)OpCode.CPX;
+
+                case 0xEC:
+                    CPUCycles += 4;
+                    goto case (byte)OpCode.CPX;
+
+                /* CPX - Compare Y Register */
+                case 0xC0:
+                    CPUCycles += 2;
+                    goto case (byte)OpCode.CPY;
+
+                case 0xC4:
+                    CPUCycles += 3;
+                    goto case (byte)OpCode.CPY;
+
+                case 0xCC:
+                    CPUCycles += 4;
+                    goto case (byte)OpCode.CPY;
 
                 /*SED - Set Decimal)*/
                 case 0xF8:
@@ -259,12 +319,41 @@ namespace BSharpEmu.CPU
                  * CMP - Compare Accumulator 
                  * Affects Flags : S, Z, C
                  */
+                 //TODO: COMBINE WITH CPX/CPY
+
                 case (byte)OpCode.CMP:                    
                     var result = (A-input);                   
                     SetCarryFlag(Convert.ToByte(result > 0x100)); 
                     SetSignFlag((byte)result);
                     SetZeroFlag((byte)(result &= 0xff));
                     break;
+
+                /* 
+                 * CPX - Compare Register X 
+                 * Affects Flags : S, Z, C
+                 */
+                 //TODO: COMBINE WITH CMP/CPY
+
+                case (byte)OpCode.CPX:
+                    var x_reg = (A - input);
+                    SetCarryFlag(Convert.ToByte(x_reg > 0x100));
+                    SetSignFlag((byte)x_reg);
+                    SetZeroFlag((byte)(x_reg &= 0xff));
+                    break;
+
+                /* 
+                 * CPX - Compare Register Y 
+                 * Affects Flags : S, Z, C
+                 */
+                 //TODO: COMBINE WITH CMP/CPX
+
+                case (byte)OpCode.CPY:
+                    var y_reg = (A - input);
+                    SetCarryFlag(Convert.ToByte(y_reg > 0x100));
+                    SetSignFlag((byte)y_reg);
+                    SetZeroFlag((byte)(y_reg &= 0xff));
+                    break;
+
                 #endregion
 
                 default: break;
